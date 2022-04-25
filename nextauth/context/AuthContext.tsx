@@ -1,9 +1,9 @@
-import { createContext, FunctionComponent, ReactNode, useContext, useState } from "react";
+import { createContext, FunctionComponent, ReactNode, useContext, useEffect, useState } from "react";
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
 
 import { SessionResponse, User } from "../@types";
 import { api } from "../services/api";
+import { cleanCookies, getCookies, updateTokens } from '../utils/cookie';
 
 type Credentials = {
    email: string;
@@ -28,23 +28,10 @@ export const AuthContextProvider: FunctionComponent<{ children: ReactNode }> = (
          const { data } = await api.post<SessionResponse>('/sessions', { email, password });
          const { permissions, roles, token, refreshToken } = data;
 
-         //sessionStorage - se fechar o navegador, acabou o sessionStorage
-         //localStorage - como estamos usando next ele não é apenas browser
-         //cookies - melhor opção
-         /**
-          * 1. contexto da requisição => utilizado no server side render
-          * 2. nome do cookie
-          * 3. valor do token
-          */
+         updateTokens(token, refreshToken);
 
-         setCookie(undefined, 'nextauth.token', token, { 
-            maxAge: 60 * 60 * 24 * 30, //30 days
-            path: '/', //caminhos que tem acesso o cookie => / é para acesso global
-         });
-         setCookie(undefined, 'nextauth.refreshToken', refreshToken), {
-            maxAge: 60 * 60 * 24 * 30,
-            path: '/'
-         };
+         //@ts-ignore
+         api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
          setUser({ permissions, roles, email });
          router.push('/dashboard');
@@ -55,6 +42,29 @@ export const AuthContextProvider: FunctionComponent<{ children: ReactNode }> = (
          return null;
       }
    };
+
+   const handleFirstVisit = async () => {
+      const cookies = getCookies();
+      const { 'nextauth.token': token } = cookies;
+
+      if(token) {
+         try {
+            const { data } = await api.get<User>('/me');
+            setUser(data);
+         } catch(err) {
+            setUser(undefined);
+            
+            cleanCookies();
+            router.push('/');
+
+            console.log('Error firstVisit function');
+         }
+      }
+   };
+
+   useEffect(() => {
+      handleFirstVisit();
+   }, []);
 
    return(
       <AuthContext.Provider value={{ signIn, isAuthenticated: !!user, user }}>

@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 export interface SessionResponse {
    permissions: string[];
    refreshToken: string;
@@ -10,3 +12,22 @@ export type User = {
    permissions: string[];
    roles: string[];
 };
+
+export interface RefreshResponse {
+   token: string;
+   refreshToken: string;
+   roles: string[];
+   permissions: string[];
+};
+
+export interface MeResponse {
+   token: string;
+   refreshToken: string;
+   roles: string[];
+   permissions: string[];
+};
+
+export interface RequestQueue {
+   onSuccess: (token: string) => void;
+   onFailure: (err: AxiosError) => void;
+}
