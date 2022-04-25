@@ -1,0 +1,43 @@
+.page {
+   width: 100vw;
+   height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background-color: #cecece;
+}
+
+.container {
+   display: flex;
+   flex-direction: column;
+   max-width: 450px;
+   width: 100%;
+   padding: 20px;
+   background-color: #fff;
+   border-radius: 8px;
+   gap: 5px;
+}
+
+.container input {
+   height: 48px;
+   border-radius: 8px;
+   width: 100%;
+   padding: 5px 10px;
+}
+
+.container button {
+   height: 48px;
+   border-radius: 8px;
+   width: 100%;
+   padding: 5px 10px;
+   background: #000;
+   color: #fff;
+   border: 0;
+   cursor: pointer;
+
+   transition: opacity .6s ease;
+}
+
+.container button:hover {
+   opacity: 0.6;
+}
