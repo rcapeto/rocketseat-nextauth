@@ -2,7 +2,7 @@ import { createContext, FunctionComponent, ReactNode, useContext, useEffect, use
 import { useRouter } from 'next/router';
 
 import { SessionResponse, User } from "../@types";
-import { api } from "../services/api";
+import { api } from "../services/apiClient";
 import { cleanCookies, getCookies, updateTokens } from '../utils/cookie';
 
 type Credentials = {
@@ -38,7 +38,7 @@ export const AuthContextProvider: FunctionComponent<{ children: ReactNode }> = (
 
          return data;
       } catch(err) {
-         console.log('Error in signin method.');
+         console.log('Error in signIn method.');
          return null;
       }
    };
